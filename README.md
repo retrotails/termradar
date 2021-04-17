@@ -16,6 +16,4 @@ Requirements:
 - numpy
 
 Known issues:
-* the SVG parser is not robust enough for some SVG weirdness,..
-	like how "1.2.3" can be interpreted as [1.2, .3]..
-	inkscape plain SVGs should import fine
+* the SVG parser is not robust enough for some SVG weirdness, like how "1.2.3" can be interpreted as [1.2, 0.3]. inkscape plain SVGs should import fine
