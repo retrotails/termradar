@@ -5,7 +5,7 @@ Simple terminal application to download (scrape) and show NOAA weather radar ani
 Will only work with continental US.
 For usage, see "termradar.py -h"
 
-For now, the only way to configure termradar is by editing main.py
+For now, the only way to configure termradar is by editing termradar.py
 
 Requirements:
 * wget
