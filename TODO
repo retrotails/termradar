@@ -4,7 +4,7 @@ add precipitation colors
 
 check age of images, suggest refreshing
 
-add 255 color mode
+add some sort of high-color mode
 
 animate by remembering difference between frames
 automatically save frames with timestamp to play in a row,
@@ -14,3 +14,9 @@ halfres does not have contiguous lines
 
 use control characters to allocate the space first, prevent glitching when the terminal can't keep up
 
+to save people from having to open the SVG and look at coordinates, add presets for each state
+	maybe interactive clicking on full map?
+
+add option to change outline and pin colors
+
+add ability to cancel without CTRL+C/Z
