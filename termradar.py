@@ -17,6 +17,7 @@
 '''
 
 from os import get_terminal_size, path, makedirs, remove
+from os.path import expanduser
 from re import split, search
 from time import sleep
 from math import floor
@@ -27,49 +28,15 @@ from subprocess import run, PIPE
 from glob import glob
 from configparser import ConfigParser
 config = ConfigParser()
-def clamp(v,n,x):
-	return min(max(v,n),x)
-
-### Start configuration ###
+def clamp(v,n,x): return min(max(v,n),x)
 
 # Map resolution
 res_img = [7000, 3500]
 
-# col_actual is the RGB values for your actual terminal colors,
-# used to find the closest color for approximation of the image.
-# You can put the hex color codes for your terminal theme here,
-# if you want the map colors to match better
-col_actual = [
-	[0x00,0x00,0x00], # black
-	[0xaa,0x00,0x00], # red
-	[0x00,0xaa,0x00], # green
-	[0xaa,0xaa,0x00], # orange
-	[0x00,0x00,0xaa], # blue
-	[0xaa,0x00,0xaa], # purple
-	[0x00,0xaa,0xaa], # cyan
-	[0xaa,0xaa,0xaa], # grey
-	[0x55,0x55,0x55], # dark grey
-	[0xff,0x55,0x55], # light red
-	[0x55,0xff,0x55], # light green
-	[0xff,0xff,0x55], # yellow
-	[0x55,0x55,0xff], # light blue
-	[0xff,0x55,0xff], # light purple
-	[0x55,0xff,0xff], # light cyan
-	[0xff,0xff,0xff], # white
-]
-col_actual = np.array(col_actual)
-
-
-### End configuration ###
-
-
 # Find config directory
 from xdg.BaseDirectory import xdg_config_home
-if "xdg_config_home" in locals():
-	conf_dir = xdg_config_home
-else:
-	from path import expanduser
-	conf_dir = expanduser("~/.config")
+if "xdg_config_home" in locals(): conf_dir = xdg_config_home
+else: conf_dir = expanduser("~/.config")
 conf_dir = path.join(conf_dir, "termradar")
 if not path.exists(conf_dir):
 	err = makedirs(conf_dir, 0o755, True)
@@ -78,11 +45,8 @@ if not path.exists(conf_dir):
 
 # Do the same, find cache directory
 from xdg.BaseDirectory import xdg_cache_home
-if "xdg_cache_home" in locals():
-	cache_dir = xdg_cache_home
-else:
-	from path import expanduser
-	cache_dir = expanduser("~/.cache")
+if "xdg_cache_home" in locals(): cache_dir = xdg_cache_home
+else: cache_dir = expanduser("~/.cache")
 cache_dir = path.join(cache_dir, "termradar")
 if not path.exists(cache_dir):
 	err = makedirs(cache_dir, 0o755, True)
@@ -92,19 +56,23 @@ if not path.exists(cache_dir):
 # Create default config file
 if not path.exists(path.join(conf_dir, "config")):
 	with open(path.join(conf_dir, "config"),"a+") as f:
-		f.write("[main]\nrect=300,1000,1000,1500\npins=1100,2050;800,1777\n")
+		f.write(
+			"[main]\n"
+			"rect=300,1000,1000,1500\n"
+			"pins=1100,2050;800,1777\n"
+			"termcolors=000000,aa0000,00aa00,aaaa00,0000aa,aa00aa,00aaaa,aaaaaa,"
+				"555555,ff5555,55ff55,ffff55,5555ff,ff55ff,55ffff,ffffff\n"
+		)
 
 # Load config file
-try:
-	config.read(path.join(conf_dir, "config"))
+try: config.read(path.join(conf_dir, "config"))
 except:
 	print("Could not parse config file, \"" + path.join(conf_dir, "config") + "\", try deleting it.")
 	exit(1)
 
 # Check if configuration is valid
 rect = []
-for i in split(",", config.get("main", "rect")):
-	rect.append(int(i))
+for i in split(",", config.get("main", "rect")): rect.append(int(i))
 if not (
 	rect[0] > 0 and rect[0] + rect[2] < res_img[0] and
 	rect[1] > 0 and rect[1] + rect[3] < res_img[1]
@@ -121,12 +89,26 @@ for i in split(";", config.get("main", "pins")):
 	pins.append(p)
 # TODO check if pins are valid
 
-
+# import terminal colors from config
 # https://stackoverflow.com/questions/54242194/python-find-the-closest-color-to-a-color-from-giving-list-of-colors/54244301#54244301
 def closest(color):
 	color = np.array(color)
 	distances = np.sqrt(np.sum((col_actual-color)**2,axis=1))
 	return np.where(distances==np.amin(distances))[0][0]
+# convert "#rrggbb" to "['0xrr', '0xgg', '0xbb']" for numpy
+col_actual = split(",", config.get("main", "termcolors"))
+if len(col_actual) != 16:
+	print("\"termcolors\" configuration option needs 16 values (has " + str(len(col_actual)) + "). Try deleting " + conf_dir)
+	exit(1)
+for c in range(len(col_actual)):
+	col_actual[c] = [
+		int(col_actual[c][0:2], 16),
+		int(col_actual[c][2:4], 16),
+		int(col_actual[c][4:6], 16),
+	]
+col_actual = np.array(col_actual)
+
+
 
 def is_int(i):
 	try: int(i); return True
@@ -202,6 +184,7 @@ res = [
 	floor(res_scale*rect[2]),
 	floor(res_scale*rect[3])
 ]
+
 
 # Scrape TIF images from NOAA using some lazy commands
 def get_map(frames, location):
@@ -386,9 +369,7 @@ ly = ("_JBNMPADB?LVNBIAGIBO?@A@F?HCAG?IBGFIABAFATFPDBJ??????NCUC@AAC?B?CAAGB@GCD
 "A?KEM,oZ?,cV?CCK?,_Q?@I,qNA,oO?kB,sO@,oUHEBDFDB?@BAADGFELGJ?JD@J@A@CGAE@ABECA?D?FHEBBF?BAJVDF@t@,oTBHBHJLH|A,uLK,uLK,uLI,{MLjA,oKCEEECOOSCCC,mKEAGEIEKG@Aa@AB@"
 "?@?,qOJ?WC,oPDBB\\?X,cOA????,{NK?EMAAEICCG?EIGC,_PM,}Pc@?B?,aRq@A,aRUJAFC?B?@C?I?CCAACAGAI,uSKQEGEDCBB?F@JJJCANAD?HHKF,yTOCACACE@?@A@?G?,_X??????,}UA@A?A?,_XH"
 "@FBF?D?BCBBAF@?@F,kYb@?@BDAB@GGCGAEEEA?AECCCCGCCGECGEA?A,_XAAwB{@,u]BDDD?,_XqAMECACGEKMGI?GE?F@D@C?")
-lines_x = []
-lines_y = []
+lines_x,lines_y = [],[]
 for f in lx.split(","): lines_x.append(decompress(f))
 for f in ly.split(","): lines_y.append(decompress(f))
-
 main()
