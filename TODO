@@ -22,3 +22,5 @@ add option to change outline and pin colors
 add ability to cancel without CTRL+C/Z
 
 cache compressed .tif archives, don't redownload
+
+make "color temperature clamp" configurable, somewhere

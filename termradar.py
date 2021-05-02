@@ -92,10 +92,12 @@ for i in split(";", config.get("main", "pins")):
 # import terminal colors from config
 # https://stackoverflow.com/questions/54242194/python-find-the-closest-color-to-a-color-from-giving-list-of-colors/54244301#54244301
 def closest(color):
+	# clamp out the mostly useless "colder" colors that are just noise
+	if color[0]*2 + color[1]*0.5 - color[2]*2 < 128: return 0
 	color = np.array(color)
 	distances = np.sqrt(np.sum((col_actual-color)**2,axis=1))
 	return np.where(distances==np.amin(distances))[0][0]
-# convert "#rrggbb" to "['0xrr', '0xgg', '0xbb']" for numpy
+# convert "#rrggbb" to "[0xrr, 0xgg, 0xbb]" for numpy
 col_actual = split(",", config.get("main", "termcolors"))
 if len(col_actual) != 16:
 	print("\"termcolors\" configuration option needs 16 values (has " + str(len(col_actual)) + "). Try deleting " + conf_dir)
