@@ -104,13 +104,16 @@ for path in path_str:
 			turtle[1] = line[1]
 	# Export X and Y separately for better compression
 	# Also divide by 5 to save more space
-	for j in range(0, len(line)-2, 2):
-		out_x.append(int(line[j]/5))
-		out_y.append(int(line[j+1]/5))
-		out_x.append(int(line[j+2]/5))
-		out_y.append(int(line[j+3]/5))
-
+	ox = []
+	oy = []
+	for j in range(0, len(line), 2):
+		ox.append(int(line[j]/5))
+		oy.append(int(line[j+1]/5))
+	out_x.append(ox)
+	out_y.append(oy)
 print("X:")
-print(compress(out_x).replace("\\", "\\\\"))
+for i in out_x:
+	print(compress(i).replace("\\", "\\\\"))
 print("Y:")
-print(compress(out_y).replace("\\", "\\\\"))
+for i in out_y:
+	print(compress(i).replace("\\", "\\\\"))
