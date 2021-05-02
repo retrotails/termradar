@@ -20,3 +20,5 @@ to save people from having to open the SVG and look at coordinates, add presets 
 add option to change outline and pin colors
 
 add ability to cancel without CTRL+C/Z
+
+cache compressed .tif archives, don't redownload
