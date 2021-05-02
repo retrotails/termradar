@@ -93,7 +93,7 @@ for i in split(";", config.get("main", "pins")):
 # https://stackoverflow.com/questions/54242194/python-find-the-closest-color-to-a-color-from-giving-list-of-colors/54244301#54244301
 def closest(color):
 	# clamp out the mostly useless "colder" colors that are just noise
-	if color[0]*2 + color[1]*0.5 - color[2]*2 < 128: return 0
+	if color[0]*2 + color[1]*1 - color[2]*3 < 128: return 0
 	color = np.array(color)
 	distances = np.sqrt(np.sum((col_actual-color)**2,axis=1))
 	return np.where(distances==np.amin(distances))[0][0]
@@ -208,7 +208,7 @@ def get_map(frames, location):
 	for f in range(frames):
 		print("Downloading frame " + str(f))
 		fil = open(path.join(location, str(i) + ".tif"), "wb")
-		fil.write(get_tif(files[-(i*4 + 1)]))
+		fil.write(get_tif(files[-(i*8 + 1)]))
 		fil.close()
 		i += 1
 
