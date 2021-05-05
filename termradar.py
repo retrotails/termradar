@@ -80,7 +80,7 @@ def get_map(frames, location):
 		fil.write(get_tif(files[-(i*8 + 1)]))
 		fil.close()
 		i += 1
-
+# Get the string of control characters and unicode to print for one frame
 def get_str(index):
 	def set_pixel(x,y,c):
 		if x >= 0 and x < res[0] and y >= 0 and y < res[1]:
@@ -142,7 +142,6 @@ def get_str(index):
 				floor((p[1] - rect[1])*res_scale),
 				"blink"
 			)
-
 	string = ""
 	for y in range(0, res[1]-2, 2):
 		string += "\n"
@@ -276,10 +275,8 @@ res_term[0] = min(res_term[0], 512)
 res_term[1] = min(res_term[1], 1024)
 
 res_scale = min(res_term[0]/rect[2], res_term[1]/rect[3])
-res = [
-	floor(res_scale*rect[2]),
-	floor(res_scale*rect[3])
-]
+res[0] = floor(res_scale*rect[2])
+res[1] = floor(res_scale*rect[3])
 
 def main():
 	if args.update:
@@ -301,13 +298,11 @@ def main():
 			sleep(1.5)
 	else: print(get_str(0))
 
-
 # Map data
-
 
 # https://github.com/amit1rrr/numcompress/
 def decompress(text):
-	def decompress_number(text, index):
+	def decompress_number(index):
 		result,shift = 1,0
 		while True:
 			b = ord(text[index]) - 64
@@ -319,7 +314,7 @@ def decompress(text):
 	result = []
 	index,last_num = 0,0
 	while index < len(text):
-		index, diff = decompress_number(text, index)
+		index, diff = decompress_number(index)
 		last_num += diff
 		result.append(last_num)
 	return result
