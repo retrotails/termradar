@@ -10,8 +10,6 @@ animate by remembering difference between frames
 automatically save frames with timestamp to play in a row,
 	with blended frames?
 
-halfres does not have contiguous lines
-
 use control characters to allocate the space first, prevent glitching when the terminal can't keep up
 
 to save people from having to open the SVG and look at coordinates, add presets for each state
@@ -21,6 +19,8 @@ add option to change outline and pin colors
 
 add ability to cancel without CTRL+C/Z
 
-cache compressed .tif archives, don't redownload
+cache compressed .tif archives, don't redownload when running --update
 
 make "color temperature clamp" configurable, somewhere
+
+find pure python alternative for closest color, ditch numpy
