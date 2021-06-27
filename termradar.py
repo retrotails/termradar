@@ -75,7 +75,7 @@ def get_map(frames, location):
 	# Download and save to file
 	i = 0
 	for f in range(frames):
-		print("Downloading frame " + str(f))
+		print("Downloading frame " + str(f+1) + " of " + str(frames))
 		fil = open(path.join(location, str(i) + ".tif"), "wb")
 		fil.write(get_tif(files[-(i*8 + 1)]))
 		fil.close()
@@ -212,7 +212,7 @@ if not path.exists(cache_dir):
 
 # Create default config file
 if not path.exists(path.join(conf_dir, "config")):
-	with open(path.join(conf_dir, "config"),"a+") as f:
+	with open(path.join(conf_dir, "config"),"w") as f:
 		f.write(
 			"[main]\n"
 			"rect=300,1000,1000,1500\n"
