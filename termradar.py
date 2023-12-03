@@ -32,8 +32,6 @@ config = ConfigParser()
 def clamp(v,n,x): return min(max(v,n),x)
 # https://stackoverflow.com/questions/54242194/python-find-the-closest-color-to-a-color-from-giving-list-of-colors/54244301#54244301
 def closest(color):
-	# clamp out the mostly useless "colder" colors that are just noise
-	if color[0]*2 + color[1]*1 - color[2]*3 < 128: return 0
 	color = np.array(color)
 	distances = np.sqrt(np.sum((col_actual-color)**2,axis=1))
 	return np.where(distances==np.amin(distances))[0][0]
@@ -58,7 +56,7 @@ res_img = [7000, 3500] # Map resolution
 
 # Scrape TIF images from NOAA using some lazy commands
 def get_map(frames, location):
-	base_url = "https://mrms.ncep.noaa.gov/data/RIDGEII/L2/CONUS/CREF_RAW/"
+	base_url = "https://mrms.ncep.noaa.gov/data/RIDGEII/L2/CONUS/CREF_QCD/"
 	def get_tif(url):
 		tif = run(["wget", "-O", "-", "-o", "/dev/null", base_url + url + ".tif.gz"], check=True, capture_output=True)
 		out = run(["gunzip", "-c"], input=tif.stdout, capture_output=True)
