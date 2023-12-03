@@ -18,7 +18,6 @@
 
 from sys import exit
 from os import get_terminal_size, path, makedirs, remove
-from os.path import expanduser
 from re import split, search
 from time import sleep
 from math import floor
@@ -76,6 +75,7 @@ def get_map(frames, location):
 	i = 0
 	for f in range(frames):
 		print("Downloading frame " + str(f+1) + " of " + str(frames))
+		# ~ print("DEBUG: " + files[-(i*8 + 1)])
 		fil = open(path.join(location, str(i) + ".tif"), "wb")
 		fil.write(get_tif(files[-(i*8 + 1)]))
 		fil.close()
@@ -191,20 +191,25 @@ parser.add_argument("--update",
 args = parser.parse_args()
 
 # Find config directory
-from xdg.BaseDirectory import xdg_config_home
-if "xdg_config_home" in locals(): conf_dir = xdg_config_home
-else: conf_dir = expanduser("~/.config")
-conf_dir = path.join(conf_dir, "termradar")
+try:
+        from xdg.BaseDirectory import xdg_config_home
+except ImportError:
+        print("python-xdg not installed, assuming ~/.config/")
+finally:
+	if "xdg_config_home" in locals(): conf_dir  = xdg_config_home
+	if "xdg_cache_home"  in locals(): cache_dir = xdg_cache_home
+if not "conf_dir" in locals():
+	conf_dir = path.expanduser("~/.config")
+	conf_dir = path.join(conf_dir, "termradar")
+if not "cache_dir" in locals():
+	cache_dir = path.expanduser("~/.cache")
+	cache_dir = path.join(cache_dir, "termradar")
+
 if not path.exists(conf_dir):
 	err = makedirs(conf_dir, 0o755, True)
 	if (err):
 		raise ValueError("Error: \"" + conf_dir + "\" could not be created (" + err +")")
 
-# Do the same, find cache directory
-from xdg.BaseDirectory import xdg_cache_home
-if "xdg_cache_home" in locals(): cache_dir = xdg_cache_home
-else: cache_dir = expanduser("~/.cache")
-cache_dir = path.join(cache_dir, "termradar")
 if not path.exists(cache_dir):
 	err = makedirs(cache_dir, 0o755, True)
 	if (err):
@@ -236,7 +241,9 @@ if not (
 	exit("Can't be negative and must be within map size. ({0} x {1})".format(res_img[0], res_img[1]))
 
 pins = []
-for i in split(";", config.get("main", "pins")):
+for i in split(";", config.get("main", "pins",fallback="")):
+	if i == "":
+		break
 	p = []
 	for s in split(",", i):
 		p.append(int(s))
